@@ -1,0 +1,30 @@
+import fs from 'fs';
+import path from 'path';
+
+function findFileFullPath(sourceDirectory: string, targetFileName: string): string {
+    const dirents = fs.readdirSync(sourceDirectory, { withFileTypes: true });
+
+    for (const dirent of dirents) {
+        const resolvedPath = path.resolve(sourceDirectory, dirent.name);
+        if (dirent.isDirectory()) {
+            const result = findFileFullPath(resolvedPath, targetFileName);
+            if (result) {
+                return result;
+            }
+        } else if (dirent.name === targetFileName) {
+            return resolvedPath;
+        }
+    }
+
+    throw new Error('File not found');
+}
+
+// Example usage:
+try {
+    const sourceDirectory = '/path/to/source/directory';
+    const targetFileName = 'example.txt';
+    const fullPath = findFileFullPath(sourceDirectory, targetFileName);
+    console.log('Full path:', fullPath);
+} catch (error) {
+    console.error(error);
+}
